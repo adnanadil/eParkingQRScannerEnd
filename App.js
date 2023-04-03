@@ -105,19 +105,30 @@ export default function App() {
         // We will check if the time is right to
         // open the gate.
   
+        // NOT USING DATE TO FILTER AS THE USER CAN ONLY SEE TODAY'S PARKINGS
         var unixTimestamp = Date.now();
         var localDate_fromUnix = new Date(unixTimestamp).toLocaleString("en-US", {
           localeMatcher: "best fit",
           timeZoneName: "short",
         });
-        var currentTimeToConvert = localDate_fromUnix.slice(11, 22);
+        var arrayStringTime = localDate_fromUnix.split(" ")
+        // var currentTimeToConvert = localDate_fromUnix.slice(11, 22);
+        var currentTimeToConvert = arrayStringTime[1] + " " + arrayStringTime[2];
         var currentHoursIn24hours = convertTime(currentTimeToConvert);
+
+        let bookingTimeToMinus1;
+        if (arrayOfBookingsObjects[0].timeInt === 0){
+          bookingTimeToMinus1 = 23
+        }else{
+          bookingTimeToMinus1 = arrayOfBookingsObjects[0].timeInt - 1;
+        }
   
-        // console.log(`current Time Here: ${parseInt(currentHoursIn24hours) === arrayOfBookingsObjects[0].timeInt}`)
-        if (parseInt(currentHoursIn24hours) === arrayOfBookingsObjects[0].timeInt){
+        console.log(`current Time : ${parseInt(currentHoursIn24hours)}`)
+        console.log(`Booking Time: ${arrayOfBookingsObjects[0].timeInt}`)
+        if ((parseInt(currentHoursIn24hours) === bookingTimeToMinus1) ||(parseInt(currentHoursIn24hours) === arrayOfBookingsObjects[0].timeInt)){
           // It is the right time to open the gate.
           setMessageToDisplay(`Initiating Gate Open ...`)
-          socket.emit("send_message", { message: "Open Gate", room: "16" });
+          socket.emit("send_message", { message: "O", room: "16" });
         }else{
           // The gate cannot be opned at this time as the parking 
           // time is not the current Hour
