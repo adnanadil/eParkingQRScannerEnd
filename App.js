@@ -11,8 +11,8 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { io } from "socket.io-client";
 
 export default function App() {
-  const socket = io.connect("http://socket-io-server-utb-tele-bot.herokuapp.com");
-  const [hasPermission, setHasPermission] = React.useState(false);
+  const socket = io.connect("dry-brushlands-40059.herokuapp.com");
+  // const socket = io.connect("http://localhost:3001");  const [hasPermission, setHasPermission] = React.useState(false);
   const [scanData, setScanData] = React.useState();
   const [messageToDisplay, setMessageToDisplay] = useState("");
 
