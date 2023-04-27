@@ -10,8 +10,9 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 
 import { io } from "socket.io-client";
 
+
 export default function App() {
-  const socket = io.connect("dry-brushlands-40059.herokuapp.com");
+   const socket = io.connect("dry-brushlands-40059.herokuapp.com");
   // const socket = io.connect("http://localhost:3001");  
   const [hasPermission, setHasPermission] = React.useState(false);
   const [scanData, setScanData] = React.useState();
@@ -129,7 +130,8 @@ export default function App() {
         if ((parseInt(currentHoursIn24hours) === bookingTimeToMinus1) ||(parseInt(currentHoursIn24hours) === arrayOfBookingsObjects[0].timeInt)){
           // It is the right time to open the gate.
           setMessageToDisplay(`Initiating Gate Open ...`)
-          socket.emit("send_message", { message: "O", room: "16" });
+          // socket.emit("send_message", { message: "O", room: "16" });
+          socket.emit("send_message", "O");
         }else{
           // The gate cannot be opned at this time as the parking 
           // time is not the current Hour
