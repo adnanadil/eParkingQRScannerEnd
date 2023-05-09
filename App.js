@@ -1,17 +1,20 @@
-import { StatusBar } from "expo-status-bar";
+// Importing the libraries and the files  
 import { StyleSheet, Text, View, Button } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import DropDownPicker from "react-native-dropdown-picker";
 import { SafeArea } from "./components/SafeArea";
 
+// Importing the firebase functions defined by us in a file and the built in Firestore functions for the library
 import { db } from "./utils/firebase.utils";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
 import { io } from "socket.io-client";
 
 
+// This is the main function that defines the functional React component and it has to start with capital letter
 export default function App() {
+  // Connecting our server and defining a few state variables to be used
    const socket = io.connect("http://dry-brushlands-40059.herokuapp.com");
   // const socket = io.connect("http://localhost:3001");  
   const [hasPermission, setHasPermission] = React.useState(false);
@@ -29,6 +32,7 @@ export default function App() {
     { label: "Item 4", value: "4" },
   ]);
 
+  // Function to get all the parking lots from our database we will show this in our dropdown picker
   const getAllTheParkingLots = async () => {
     const q = query(collection(db, "parkingLots"));
 
@@ -43,11 +47,13 @@ export default function App() {
     setItems(parkingLotsHolder);
   };
 
+  // Runs once the component mounts and we will get all the parking lots saved in the database 
   useEffect(() => {
     getAllTheParkingLots();
     console.log(parkingLots);
   }, []);
 
+  // This useEffect is used to get the permission from the user to use the phone's camera
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -55,6 +61,7 @@ export default function App() {
     })();
   }, []);
 
+  // We make sure that the sure that user has given permission to use the camera
   if (!hasPermission) {
     return (
       <View style={styles.container}>
@@ -63,6 +70,7 @@ export default function App() {
     );
   }
 
+  // function to handle the scanned bar code and get data from it
   const handleBarCodeScanned = ({ type, data }) => {
     setScanData(data);
     console.log(`Data: ${data}`);
@@ -70,8 +78,8 @@ export default function App() {
     handleSearch(data);
   };
 
+  // Function to verify the data from the QR code against the bookings in the Firestore database
   const handleSearch = (data) => {
-    console.log(`Hello There we have got a scan`);
     // We need to get the current Time in hours of Int
     // Then based on the parking Lot we will search their reservations
     // If we get the reservation in that time we will show the parking
@@ -82,14 +90,20 @@ export default function App() {
     getTheScannedParkings(data);
   };
 
+
+// We will check for the booking in the respective bookings collection of the parking lot
   const getTheScannedParkings = async (data) => {
     console.log(`We will find in reservations-${value}`);
     console.log(`For the parking ${data}`);
+    // If no parking lot is chosen from the dropdown
     if (value === null) {
       //WE NEED TO ASK THE USE TO CHOOSE A PARKING SLOT..
       setMessageToDisplay(`PLEASE CHOOSE A PARKING LOT !!`)
     }
+    // If a parking lot is chosen then we will search the booking in the parking lot
     else {
+
+      // Firestore function to search
       const q = query(
         collection(db, `reservations-${value}`),
         where("parkingID", "==", data)
@@ -114,7 +128,6 @@ export default function App() {
           timeZoneName: "short",
         });
         var arrayStringTime = localDate_fromUnix.split(" ")
-        // var currentTimeToConvert = localDate_fromUnix.slice(11, 22);
         var currentTimeToConvert = arrayStringTime[1] + " " + arrayStringTime[2];
         var currentHoursIn24hours = convertTime(currentTimeToConvert);
 
@@ -168,15 +181,6 @@ export default function App() {
           style={StyleSheet.absoluteFillObject}
           onBarCodeScanned={scanData ? undefined : handleBarCodeScanned}
         />
-        {/* {scanData && (
-          <View>
-            <Button
-              title="Scan Again?"
-              onPress={() => setScanData(undefined)}
-            />
-          </View>
-        )} */}
-
         <View style={styles.pickerView}>
           <DropDownPicker
             open={open}
@@ -188,7 +192,6 @@ export default function App() {
           />
         </View>
         <View style={styles.spacer}></View>
-        {/* {scanData && ( */}
         <View style={styles.scanAgain}>
           <Text style={styles.messageStyle}>{messageToDisplay}</Text>
           <Button
@@ -196,7 +199,6 @@ export default function App() {
             title="Scan Again"
             onPress={scanAgainPressed}
           />
-          {/* )} */}
         </View>
       </View>
     </SafeArea>
@@ -206,26 +208,16 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // flexDirection: "coloumn",
     backgroundColor: "#fff",
-    // alignItems: "center",
-    // justifyContent: "center",
   },
   pickerView: {
     flex: 0.3,
-    // backgroundColor: "red",
-    // backgroundColor: "#fff",
     judtifySelf: "flex-start",
-    // alignItems: "center",
-    // justifyContent: "center",
   },
   spacer: {
     flex: 0.7,
-    // backgroundColor: "red",
-    // judtifySelf: "flex-start",
   },
   scanAgain: {
-    // backgroundColor: "red",
     flexDirection: "column",
   },
   messageStyle: {
